@@ -15,7 +15,7 @@ class DiskMetrics(object):
     """called by collectd to configure the plugin. This is called only once"""
     for node in conf.children:
       if node.key == 'LogDirs':
-        self.logdir = node.values[0].split(",")
+        self.logdirs = node.values[0].split(",")
       elif node.key == 'Verbose':
         self.verbose = bool(node.values[0])
       else:
@@ -36,7 +36,7 @@ class DiskMetrics(object):
       if stats:
         self.dispatch_metrics(stats)
     else:
-      self.collectd.warning('g1gc plugin: skipping because no log directory ("LogDir") has been configured')
+      self.collectd.warning('g1gc plugin: skipping because no log directory ("LogDirs") has been configured')
 
 
   def add_stats(self, log_dir, stats):
@@ -122,6 +122,6 @@ if __name__ == '__main__':
   dm.read_callback()
 else:
   import collectd
-  gc = DiskMetrics(collectd)
-  collectd.register_config(gc.configure_callback)
-  collectd.register_read(gc.read_callback)
+  dm = DiskMetrics(collectd)
+  collectd.register_config(dm.configure_callback)
+  collectd.register_read(dm.read_callback)
