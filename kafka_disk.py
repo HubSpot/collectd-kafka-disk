@@ -6,10 +6,11 @@ disk_bytes    = 'kafka-disk-bytes'
 num_logs      = 'kafka-num-logs'
 
 class DiskMetrics(object):
-  def __init__(self, collectd, logdirs=None, verbose=False):
+  def __init__(self, collectd, logdirs=None, verbose=False, interval=False):
     self.collectd = collectd
     self.logdirs = logdirs
     self.verbose = verbose
+    self.interval = interval
 
   def configure_callback(self, conf):
     """called by collectd to configure the plugin. This is called only once"""
@@ -18,6 +19,8 @@ class DiskMetrics(object):
         self.logdirs = node.values[0].split(",")
       elif node.key == 'Verbose':
         self.verbose = bool(node.values[0])
+      elif node.key == 'Interval':
+        self.interval = int(node.values[0])
       else:
         self.collectd.warning('kafka-disk plugin: Unknown config key: %s.' % (node.key))
     
@@ -25,6 +28,11 @@ class DiskMetrics(object):
         disk_bytes  : 0,
         num_logs    : 0,
     }
+
+    if self.interval:
+      self.collectd.register_read(dm.read_callback, self.interval)
+    else:
+      self.collectd.register_read(dm.read_callback)
 
   def read_callback(self):
     """read the most-recently modified GC log in logdir, then return most recent datapoints from it"""
@@ -124,4 +132,3 @@ else:
   import collectd
   dm = DiskMetrics(collectd)
   collectd.register_config(dm.configure_callback)
-  collectd.register_read(dm.read_callback)

@@ -5,3 +5,4 @@ A [CollectD](http://collectd.org) plugin to collect kafka disk usage metrics. Us
 ####Configuration parameters
 - **`LogDirs`**: Kafka log dirs, as defined in server.properties. Comma-separated list. (REQUIRED: no default).
 - **`Verbose`**: if `true`, print verbose logging (`false`).
+- **`Interval`**: if set, changes the rate at which this plugin reports. otherwise defaults to collectd's configured rate
